@@ -4,6 +4,13 @@
 
 This role provides a dns server based on bind.
 
+## Data Model
+
+This role relies on [data model](https://github.com/bluebanquise/bluebanquise/blob/master/resources/data_model.md):
+* Section 1 (Networks)
+* Section 2 (Hosts definition)
+* Section 3.1 (Managements Groups)
+
 ## Instructions
 
 This DNS role will automatically add networks of the cluster defined in the Ansible inventory,
@@ -17,7 +24,7 @@ networks:
     netmask: 255.255.0.0
     broadcast: 10.11.255.255
     dhcp_server: true
-    dns_server: true  <<<<<<<<<<
+    dns_server: true  # <<<<<<<<<<
     services:
       dns:
         - ip4: 10.11.0.1

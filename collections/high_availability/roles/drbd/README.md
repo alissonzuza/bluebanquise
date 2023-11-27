@@ -1,5 +1,7 @@
 # DRBD
 
+Role currently only supports RHEL distributions. If you need other distributions, please notify me via a feature request.
+
 ## Description
 
 This role deploy a basic DRBD (Distributed Replicated Block Device) cluster to share storage between multiple nodes.
@@ -19,6 +21,8 @@ jinja version = 3.0.3
 ```
 
 ## Instructions
+
+### RHEL 8
 
 To allow role to find needed packages, you need to add elrepo repositories on 
 all the nodes:
@@ -144,9 +148,6 @@ resource1 role:Primary
   bee-meta2 role:Secondary
     peer-disk:UpToDate
 ```
-
-
-
 
 To delete the configuration (**will delete all data on the DRBD devices**)
 run the following commands :

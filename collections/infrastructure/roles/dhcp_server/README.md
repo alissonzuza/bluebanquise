@@ -5,6 +5,14 @@
 This role provides a standard and simple dhcp server combined with the iPXE roms of BlueBanquise.
 It should be enough for most networks.
 
+## Data Model
+
+This role relies on [data model](https://github.com/bluebanquise/bluebanquise/blob/master/resources/data_model.md):
+* Section 1 (Networks)
+* Section 2 (Hosts definition)
+* Section 3.1 (Managements Groups)
+* Section 3.2 (Equipment Groups)
+
 ## Instructions
 
 ### Basic usage
@@ -18,7 +26,7 @@ For a network to be included in the dhcp,
 the variable `dhcp_server` must be set to **true** in the related network configuration (note that if key do not exist, default is **true**). Refer to main Bluebanquise documentation, inventory structure, for more details, or/and see bellow example.
 
 Note also that dhcp role will use the `dhcp_unknown_range` if exist in network configuration. It defines the range of the subnet, for unregistered hosts.
-This Can be useful for temporary connections (laptops, etc) or to detect if an
+This can be useful for temporary connections (laptops, etc) or to detect if an
 hardware is missing in the inventory.
 
 By default, this role will try to use as much defined network settings as available.
@@ -82,6 +90,37 @@ Consider increasing the default leases values once your network is production re
 
 ### Advanced usage
 
+#### Add global options
+
+It is possible to include as many global settings as desired using the `dhcp_server_global_settings` list.
+
+For example:
+
+```yaml
+dhcp_server_global_settings:
+  - ping-check false
+```
+
+Note: do not include the `;` at the end, it is automatically added by the role.
+
+#### Add options per subnet
+
+It is possible to include as many per subnet settings as desired using the `dhcp_server_subnet_settings` defined under the logical network in `networks` dict.
+
+For example:
+
+```yaml
+  networks:
+    net-1:
+      subnet: 10.11.0.0
+      prefix: 16
+      dhcp_server: true
+      dhcp_server_subnet_settings:
+        - deny unknown-clients
+```
+
+Note: do not include the `;` at the end, it is automatically added by the role.
+
 #### Multiple entries
 
 It is possible to have multiple entries for an host interface in the
@@ -100,7 +139,7 @@ hosts:
         network: net-1
 ```
 
-This will create an entry related to mac address and one to dhcp client
+This will create one entry related to mac address and one to dhcp client
 identifier.
 
 #### Shared networks
@@ -139,7 +178,7 @@ parameters are available, for the host and its BMC:
 - `host_identifier`: identify based on an option (agent.circuit-id, agent.remote-id, etc) to recognize an host. Also known as option 82.
 - `match`: identify based on multiple options in combination to recognize an host. Also known as option 82 with hack.
 
-If using match, because this features is using a specific 'hack' in the dhcp
+If using `match`, because this features is using a specific 'hack' in the dhcp
 server, you **must** define this host in a shared network, even if this shared
 network contains a single network (see this very well made page for more
 information: http://www.miquels.cistron.nl/isc-dhcpd/).
@@ -176,6 +215,7 @@ This allows for example to have an heterogenous cluster, with a group of hosts b
 
 ## Changelog
 
+* 1.6.0: Added subnet custom settings. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.5.1: Fix ip and host orders. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.5.0: Update to BB 2.0 format. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.4.0: Add capability to choose ipxe ROM. Benoit Leveugle <benoit.leveugle@gmail.com>

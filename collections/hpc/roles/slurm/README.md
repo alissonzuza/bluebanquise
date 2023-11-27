@@ -25,12 +25,15 @@ Role compatibility:
     + [Acct Gather](#acct-gather)
   * [Changelog](#changelog)
 
+## Data Model
+
+This role relies on [data model](https://github.com/bluebanquise/bluebanquise/blob/master/resources/data_model.md):
+* Section 3.2 (Equipment Groups)
+
 ## Description
 
 This role provides slurm configuration for controller (server),
 computes (client) and submitters (often called login) nodes.
-
-Note: this role requires *bluebanquise_filters* package to be installed.
 
 ## Instructions
 
@@ -285,7 +288,7 @@ To Enable GPU gres the GPUS needs to be defined on the equipment_profile. You ca
 $ nvidia-smi -L
 ```
 
-You need to add the Gres extra arguments for slurm as well, so you would add something like the following to your equipment_profile.yml file if you have 8x NVIDIA A100-SXM4-40GB on your hardawre for example:
+You need to add the Gres extra arguments for slurm as well, so you would add something like the following to your equipment_profile.yml file if you have 8x NVIDIA A100-SXM4-40GB on your hardware for example:
 
 ```yaml
 ep_hardware:

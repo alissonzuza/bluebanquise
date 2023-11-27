@@ -1,5 +1,5 @@
 ---
-pxe_stack_role_version: 1.8.2
+pxe_stack_role_version: 1.8.4
 
 pxe_stack_supported_os:
   redhat:
@@ -44,6 +44,9 @@ pxe_stack_supported_os:
         - opensuse
   debian:
     - major: 11
+      distributions:
+        - debian
+    - major: 12
       distributions:
         - debian
 

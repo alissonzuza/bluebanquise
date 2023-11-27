@@ -1,0 +1,44 @@
+/* Style for the tile container */
+.comment-tile {
+    display: flex;
+    /*border: 1px solid #ccc;*/
+    max-width: 100%; /* Adjust the width as needed */
+    margin: 20px 0px;
+    /* background: #e6e6e6; */
+}
+
+/* Style for the image container on the left */
+.comment-tile-image {
+    flex: 0 0 96px; /* Fixed width for the image container */
+    display: flex;
+    align-items: stretch; /* Stretch the image container vertically */
+}
+
+/* Style for the image itself */
+.comment-tile-image img {
+    width: 100%;
+    height: auto;
+    flex: 1;
+}
+
+/* Style for the text container on the right */
+.comment-tile-text {
+    flex: 1; /* Allow it to grow and take remaining space */
+    padding: 2px 10px;
+    color: #222222de;
+    font-size: .6rem;
+}
+
+:root {
+    /* Primary color shades */
+    --md-primary-fg-color:#257ca3;
+    --md-primary-fg-color--light:#42a5f5;
+    --md-primary-fg-color--dark:#1975d2;
+    --md-primary-bg-color:#fff;
+    --md-primary-bg-color--light:#ffffffb3
+    /* Accent color shades */
+    --md-accent-fg-color:#4287ff;
+    --md-accent-fg-color--transparent:#4287ff1a;
+    --md-accent-bg-color:#fff;
+    --md-accent-bg-color--light:#ffffffb3
+}
