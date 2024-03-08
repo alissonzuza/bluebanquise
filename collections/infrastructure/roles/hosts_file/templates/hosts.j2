@@ -12,17 +12,19 @@
     {% for alias in host_dict['alias'] %}{{ alias_list.append(alias) }}{% endfor %}
   {% endif %}
 
-  {%- if host_dict['network_interfaces'] is defined and host_dict['network_interfaces'] is iterable %}
-    {%- for nic in host_dict['network_interfaces'] %}
-      {% if nic.network is defined and nic.network is not none and nic.ip4 is defined and (nic.ip4 | ansible.utils.ipaddr) %}  
-{{ nic.ip4 }} {{ host }}-{{ nic.network }} {% if nic.alias is defined %}{{ nic.alias }}{% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+  {%- if host_j2_node_main_resolution_address is not none and (host_j2_node_main_resolution_address | ansible.utils.ipaddr) %}
+{{ host_j2_node_main_resolution_address }} {{ host }} {{ host }}.{{ bb_domain_name | default(hosts_file_domain_name) }} {{ alias_list | join(' ') }}
+  {% endif -%}
 
-  {% if host_j2_node_main_resolution_address is not none and (host_j2_node_main_resolution_address | ansible.utils.ipaddr) %}
-{{ host_j2_node_main_resolution_address }} {{ host }} {{ host }}.{{ bb_domain_name | default(hosts_file_domaine_name) }} {{ alias_list|join(' ') }}
-  {% endif %}  
+  {%- if hosts_file_enable_extended_names %}
+    {%- if host_dict['network_interfaces'] is defined and host_dict['network_interfaces'] is iterable %}
+      {%- for nic in host_dict['network_interfaces'] %}
+        {%- if nic.network is defined and nic.network is not none and nic.ip4 is defined and (nic.ip4 | ansible.utils.ipaddr) %}
+{{ nic.ip4 }} {{ host }}-{{ nic.network }} {{ nic.alias | default('', true)}}
+        {% endif -%}
+      {% endfor -%}
+    {% endif -%}
+  {% endif -%}
 
   {%- if host_dict['bmc'] is defined and host_dict['bmc'] is not none %}
     {% set bmc_alias_list = [] %}
@@ -36,7 +38,6 @@
 {{ host_dict['bmc'].ip4 }} {{ host_dict['bmc'].name }} {{ bmc_alias_list|join(' ') }}
     {% endif %}
   {% endif -%}
-
 {% endmacro %}
 
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -44,9 +45,11 @@
 
 ## Internal hosts
 
-{% for host in (j2_hosts_range | sort) -%}
-{{ write_host(host,hostvars[host], hostvars[host]['j2_node_main_resolution_address'],hostvars[host]['j2_current_iceberg'],j2_current_iceberg) }}
-{%- endfor %}
+{% if bb_nodes is mapping %}
+  {% for host, host_keys in bb_nodes.items() -%}
+{{ write_host(host, host_keys, host_keys['node_main_resolution_address'], host_keys['current_iceberg'], j2_current_iceberg) }}
+  {%- endfor %}
+{% endif %}
 
 ## Services hosts
 

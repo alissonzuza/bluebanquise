@@ -62,7 +62,7 @@ networks:
 **Equipment variables:**
 
 ```yaml
-ep_operating_system:
+os_operating_system:
   distribution: redhat # centos, redhat, debian, ubuntu, opensuse, etc.
   distribution_major_version: 8
   # Optional: define a minor distribution version to force (repositories/PXE)
@@ -74,7 +74,7 @@ ep_operating_system:
 For example, if equipment_profile is:
 
 ```yaml
-ep_operating_system:
+os_operating_system:
   distribution: centos
   distribution_major_version: 8
 ```
@@ -84,7 +84,7 @@ Then path will be: repositories/centos/8/$basearch/
 If equipment_profile is:
 
 ```yaml
-ep_operating_system:
+os_operating_system:
   distribution: centos
   distribution_major_version: 8
   distribution_version: 8.1
@@ -95,7 +95,7 @@ Then path will be: repositories/centos/8.1/$basearch/
 If equipment_profile is:
 
 ```yaml
-ep_operating_system:
+os_operating_system:
   distribution: centos
   distribution_major_version: 8
   distribution_version: 8.1
@@ -118,6 +118,8 @@ And native repositories will be removed during nodes deployment (PXE install, no
 
 ## Changelog
 
+* 1.3.7: Fix services ip precedence. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.3.6: Fix extra space in automatic url. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.3.5: Adapt role to support BB 2.0 networks. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.3.4: Update to BB 2.0 format. Alexandra Darrieutort <alexandra.darrieurtort@u-bordeaux.fr>, Pierre Gay <pierre.gay@u-bordeaux.fr>
 * 1.3.3: Support gpgkey for Ubuntu. Giacomo Mc Evoy <gino.mcevoy@gmail.com>

@@ -1,11 +1,15 @@
 ---
 slurm_cluster_name: bluebanquise
 
+## Slurm user
+slurm_user_gid: 777
+slurm_user_uid: 777
+
 ## Computes configuration way to use (configfull vs configless)
 slurm_computes_config: configfull
 
 ## files path
-slurm_statesavelocation: /var/spool/slurmd/statesave
+slurm_statesavelocation: /var/spool/slurmctld/statesave
 slurm_slurmdspooldir: /var/spool/slurmd/slurmd
 slurm_slurmctldpidfile: /var/run/slurmctld.pid
 slurm_slurmdpidfile: /var/run/slurmd.pid

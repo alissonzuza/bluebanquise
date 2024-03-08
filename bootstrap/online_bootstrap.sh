@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-set -x
 export SILENT="false"
 export SKIP_ENVIRONMENT="false"
 
@@ -50,7 +49,8 @@ then
     exit 0
   fi
 fi
-echo " Proceeding..."
+echo " Proceeding and enabling verbosity..."
+set -x
 sleep 1
 echo
 message_output "Installing OS needed dependencies..."
@@ -122,7 +122,8 @@ if [ "$VERSION_ID" == "11" ] || [ "$VERSION_ID" == "12" ]; then
 fi
 
 message_output "Creating bluebanquise user, may take a while..."
-id -u bluebanquise &>/dev/null || sudo useradd --create-home --home-dir /var/lib/bluebanquise --shell /bin/bash bluebanquise
+getent group bluebanquise &>/dev/null || sudo groupadd --gid 377 bluebanquise
+getent passwd bluebanquise &>/dev/null || sudo useradd --gid 377 --uid 377 --create-home --home-dir /var/lib/bluebanquise --shell /bin/bash --system bluebanquise
 echo 'bluebanquise ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/bluebanquise
 
 if [[ $SKIP_ENVIRONMENT == "false" ]]

@@ -10,8 +10,8 @@ It should be enough for most networks.
 This role relies on [data model](https://github.com/bluebanquise/bluebanquise/blob/master/resources/data_model.md):
 * Section 1 (Networks)
 * Section 2 (Hosts definition)
-* Section 3.1 (Managements Groups)
-* Section 3.2 (Equipment Groups)
+* Section 3.1 (Function Groups)
+* Section 3.2 (Hardware Groups)
 
 ## Instructions
 
@@ -77,6 +77,8 @@ Example of network configuration, advanced dhcp server:
           - hostname: mg1
             ip: 10.11.0.1
 ```
+
+Note that if both `services` and `services_ip` are set, `services` precedence `services_ip`.
 
 Finally, note that the following parameters can be set in the inventory, to
 override default ones:
@@ -209,12 +211,18 @@ hosts:
 By default, all hosts will use global `dhcp_server_ipxe_driver` and `dhcp_server_ipxe_embed`
 settings.
 
-However, note that the role will read `ep_ipxe_driver` and `ep_ipxe_embed` equipment profile variables, and precedence global settings for hosts that have these values set.
+However, note that the role will read `hw_ipxe_driver` and `hw_ipxe_embed` equipment profile variables, and precedence global settings for hosts that have these values set.
+
+Also, if user whish to use a custom rom, it is possible to define `hw_pxe_filename` which precedence everything for the target hosts. This can be a relative path for tftp protocol (ex: `x86_64/myrom.efi`) or an http path for HTTP protocol (ex: `http://10.10.0.1/x86_64/myrom.efi`).
 
 This allows for example to have an heterogenous cluster, with a group of hosts booting on *snponly* driver, while others boot on *default* one.
 
 ## Changelog
 
+* 1.7.0: Allow services and services_ip together. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.6.3: Fix double character for ipxe rom. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.6.2: Fix missing pxe variables. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.6.1: Adapt to hw os split. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.6.0: Added subnet custom settings. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.5.1: Fix ip and host orders. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.5.0: Update to BB 2.0 format. Benoit Leveugle <benoit.leveugle@gmail.com>
