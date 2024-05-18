@@ -89,8 +89,14 @@ To achieve that, the following variables are available:
 * ssh_client_global_loglevel
 * ssh_client_global_stricthostkeychecking
 * ssh_client_global_userknownhostsfile
+* ssh_client_global_network
 
-Which are evaluated at global level, and:
+Which are evaluated at global level
+
+For example, ssh_client_global_network can be used to configure in */root/ssh/config*
+the same network for all hosts.
+
+And:
 
 * ssh_client_loglevel
 * ssh_client_stricthostkeychecking
@@ -109,6 +115,9 @@ ssh_client_userknownhostsfile: /dev/null
 At host hostvars level.
 
 ## Multiple iceberg usage
+
+**IMPORTANT: this part of the code is no more maintained, please do not use it.
+Open a request on github if you need it.**
 
 The ssh_master role allows to enable ssh ProxyJump to ssh from a top iceberg to
 hosts of a sub_iceberg, through one master of the sub_iceberg.
@@ -135,8 +144,8 @@ ssh_master_iceberg_jump_target:
 
 ```
 [iceberg3:vars]
-iceberg_master = iceberg1
-iceberg_level = 2
+bb_iceberg_master = iceberg1
+bb_iceberg_level = 2
 ssh_master_iceberg_jump_target = 10.10.0.77
 ```
 
@@ -174,6 +183,8 @@ Optional inventory vars:
 
 ## Changelog
 
+* 1.2.3: infrastructure/ssh_client role: set a default network <jean-pascal.mazzilli@gmail.com>
+* 1.2.2: Fixed ssh_client_userknownhostsfile host_vars. Leo Magdanello <lmagdanello40@gmail.com>
 * 1.2.1: Fixed sudo user home directory. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.2.0: Update to pip Ansible. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.1.1: Fix issue with empty network interfaces. johnnykeats <johnny.keats@outlook.com>

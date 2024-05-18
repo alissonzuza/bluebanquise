@@ -167,6 +167,9 @@ pxe_stack_os_firewall: true                # If firewall (RHEL only for now) sho
 # automatic partitioning will be activated.
 pxe_stack_os_partitioning:                 # Set partitioning. Use raw OS format: kickstart for RHEL, preseed for Debian, etc.
                                            # Leave empty for automated partitioning
+
+pxe_stack_os_pxe_images_root:              # Specify a custom images root for PXE other than default http://${next-server}/pxe/netboots/${eq-distribution}/${eq-distribution-version}/${eq-architecture}/
+pxe_stack_os_pxe_repository_root:          # Specify a custom os base repository root for PXE other than default http://${next-server}/repositories/${eq-repositories-environment}/${eq-distribution}/${eq-distribution-version}/${eq-architecture}/
 ```
 
 #### Equipments groups
@@ -289,6 +292,67 @@ bb_time_zone: Europe/Brussels
 ```
 
 Since it is a global cluster setting, time zone is not defined at equipment level.
+
+#### Raw content
+
+You can add raw content to auto install files using the `os_autoinstall_raw_content`.
+Please note that this is RAW. So you HAVE TO adapt the content to the target distribution.
+
+* For RHEL, this is Kickstart syntax (bottom of the kickstart file).
+* For Debian, this is preseed syntax (bottom of the preseed file).
+* For Ubuntu, this is curtin/cloud-config syntax (already placed under `autoinstall` and auto indented by 2 space).
+* For SUSE, this is autoyast syntax (inside `<profile>...</profile>`).
+
+It is also possible to fully replace autoinstallation file, by setting the `os_autoinstall_raw_file` value.
+If set, this multi lines string will **FULLY** replace the content of the BlueBanquise generated autoinstallation file.
+Of course, it is expected that user will provide syntax matching target os (kickstart, preseed, autoyast, or cloudinit/curtin).
+
+#### Proxy during PXE
+
+It is possible to set an http proxy server during PXE.
+2 main variables are available:
+
+* `os_pxe_repository_proxy`
+* `os_pxe_proxy`
+
+Please always include the `http://` part of the url.
+Note that in most cases, you can also include user and password if exist (http://user:password@proxy.example.com:3128 for example).
+
+Note however that due to the way all auto installations are operating, behavior is not always the same. I did my best to propose working solutions.
+
+* For Ubuntu, `os_pxe_repository_proxy` will be set to `proxy` key of *user-data* file and so used to reach apt repositories (refer to https://ubuntu.com/server/docs/install/autoinstall-reference). `os_pxe_proxy` will be set as kernel parameters `http_proxy={{os_pxe_proxy}} https_proxy={{os_pxe_proxy}}`.
+* For Debian, `os_pxe_repository_proxy` will be written to `d-i mirror/http/proxy` key of preseed file, and so will apply to reach installation packages repository. `os_pxe_proxy` will be passed as kernel arguments : `http_proxy={{os_pxe_proxy}} https_proxy={{os_pxe_proxy}}` and so should be exported as environment variables during the whole process.
+* For RHEL, `os_pxe_proxy` will be passed to `inst.proxy` kernel parameter. However, documentation is not clear about impacted elements (refer to https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html-single/performing_a_standard_rhel_9_installation/index). Since `os_pxe_proxy` cannot be passed as standard kernel arguments on RHEL (init filters this), this specific kernel parameter couple (http_proxy and https_proxy) is not available on RHEL systems.
+* For SUSE, `os_pxe_repository_proxy` will be set to `<proxy>...</proxy>` key of autoyast file (refer to https://doc.opensuse.org/projects/autoyast/#Configuration-Network-Proxy), while `os_pxe_proxy` will be set to kernel parameters as `proxy={{os_pxe_proxy}}` (refer to https://en.opensuse.org/SDB:Linuxrc#p_proxy).
+
+If some of these settings do not match your needs or are not working as expected, please open an issue.
+
+#### External netboot images or/and core repository during PXE
+
+It is possible to pull netboots and core repositories from an external or custom source using `os_pxe_images_root` and `os_pxe_repository_root` variables.
+The path need to be a full http url, and may contains iPXE variables.
+
+For example:
+
+```yaml
+os_pxe_images_root: http://10.10.0.1/RHEL9_iso/
+os_pxe_repository_root: http://${next-server}/rhel_core_repo/9/
+```
+
+#### Additional packages during autoinstall
+
+It is possible to set a list of packages to be installed during the automated installation.
+
+To do so, simply define the `os_autoinstall_packages` list the following way, adapting the list of packages to your needs:
+
+```yaml
+os_autoinstall_packages:
+  - curl
+  - wget
+  - vim
+```
+
+Of course, it is expected the packages you ask in the list are available in the repositories exposed to the auto-installer.
 
 ### bluebanquise-bootset usage
 
@@ -653,6 +717,13 @@ Note that using an home folder into /home for the bluebanquise sudo user can be 
 
 ## Changelog
 
+* 1.16.1: Fix proxy settings. Bug reported by @erkrali. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.16.0: Allow to pull netboot and core repo from a custom URL. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.15.0: diskless.yml task must be optional <jp.mazzilli@gmail.com>
+* 1.14.0: Set default value for images-root <jp.mazzilli@gmail.com>
+* 1.13.0: Add packages during autoinstall support. Benoit Leveugle <benoit.leveugle@gmail.com>
+* 1.12.1: Fix missing clonezilla directory. Abatcha Olloh <abatchaolloh@outlook.fr>
+* 1.12.0: Add raw content and proxies. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.11.1: Fix kernel upgrade option in bluebanquise-diskless. Giacomo Mc Evoy <gino.mcevoy@gmail.com>
 * 1.11.0: Add ability to select target disk with auto partitioning. Benoit Leveugle <benoit.leveugle@gmail.com>
 * 1.10.0: Add ability to set sudo user uid and gid. Benoit Leveugle <benoit.leveugle@gmail.com>
