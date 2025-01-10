@@ -8,9 +8,9 @@
 {% else %}
 
 autoinstall:
-  {% if os_autoinstall_packages is defined and os_autoinstall_packages is iterable and os_autoinstall_packages is not string and os_autoinstall_packages is not mapping %}
+{% if hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is defined and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is iterable and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not string and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not mapping %}
   packages:
-    {% for package in os_autoinstall_packages %}
+    {% for package in hostvars[groups[os_profile][0]]['os_autoinstall_packages'] %}
     - {{ package }}
     {% endfor %}
   {% endif %}
@@ -23,11 +23,24 @@ autoinstall:
     preserve_sources_list: {{ pxe_stack_preserve_repositories }}
   keyboard: {layout: {{ (hostvars[groups[os_profile][0]]['os_keyboard_layout'] | default(pxe_stack_os_keyboard_layout)) | lower }}, toggle: null, variant: ''}
   locale: {{ hostvars[groups[os_profile][0]]['os_system_language'] | default(pxe_stack_os_system_language) }}
+  timezone: {{ pxe_stack_time_zone | default(bb_time_zone, true) | default('Europe/Brussels', true) }}
   user-data:
 {% if not pxe_stack_enable_root %}
     users:
       - name: {{ pxe_stack_sudo_user }}
         homedir: {{ pxe_stack_sudo_user_home }}
+      {% if (hostvars[groups[os_profile][0]]['os_operating_system']['distribution_major_version'] | default(pxe_stack_os_operating_system.distribution_major_version) ) | int == 24 %}
+      {# Format is not exactly the same for Ubuntu 20/22 and Ubuntu 24 #}
+        ssh_authorized_keys:
+        {% for ssh_key in (hostvars[groups[os_profile][0]]['os_admin_ssh_keys'] | default(pxe_stack_os_admin_ssh_keys)) %}
+          - {{ ssh_key }}
+        {% endfor %}
+        {% if pxe_stack_sudo_is_passwordless %}
+        sudo: 'ALL=(ALL:ALL) NOPASSWD:ALL'
+        {% else %}
+        sudo: 'ALL=(ALL:ALL) ALL'
+        {% endif %}
+      {% else %}
         ssh-authorized-keys:
         {% for ssh_key in (hostvars[groups[os_profile][0]]['os_admin_ssh_keys'] | default(pxe_stack_os_admin_ssh_keys)) %}
           - {{ ssh_key }}
@@ -37,6 +50,7 @@ autoinstall:
         {% else %}
         sudo: ['ALL=(ALL:ALL) ALL']
         {% endif %}
+      {% endif %}
         groups: sudo
         shell: /bin/bash
         passwd: "{{ hostvars[groups[os_profile][0]]['os_admin_password_sha512'] | default(pxe_stack_os_admin_password_sha512) }}"

@@ -26,9 +26,9 @@ lang {{ hostvars[groups[os_profile][0]]['os_system_language'] | default(pxe_stac
 
 # System timezone
 {% if (hostvars[groups[os_profile][0]]['os_operating_system']['distribution_major_version'] | default(pxe_stack_os_operating_system.distribution_major_version) ) | int < 9 %}
-timezone {{ bb_time_zone | default(pxe_stack_time_zone) }} --isUtc
+timezone {{ pxe_stack_time_zone | default(bb_time_zone, true) | default('Europe/Brussels', true) }} --isUtc
 {% else %}
-timezone {{ bb_time_zone | default(pxe_stack_time_zone) }} --utc
+timezone {{ pxe_stack_time_zone | default(bb_time_zone, true) | default('Europe/Brussels', true) }} --utc
 {% endif %}
 
 # Reboot after installation
@@ -89,8 +89,8 @@ curl
 {% if not pxe_stack_enable_root %}
 sudo
 {% endif %}
-{% if os_autoinstall_packages is defined and os_autoinstall_packages is iterable and os_autoinstall_packages is not string and os_autoinstall_packages is not mapping %}
-{% for package in os_autoinstall_packages %}
+{% if hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is defined and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is iterable and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not string and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not mapping %}
+{% for package in hostvars[groups[os_profile][0]]['os_autoinstall_packages'] %}
 {{ package }}
 {% endfor %}
 {% endif %}
@@ -112,7 +112,7 @@ set -x
 {% if pxe_stack_enable_root %}
 
 # Ensure root login is enabled via ssh
-sed -i 's/^.*PermitRootLogin.*$/PermitRootLogin\ yes/' /etc/ssh/sshd_config
+sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin yes/g" /etc/ssh/sshd_config
 # Add ssh keys from ssh_keys list
 mkdir /root/.ssh
 cat << xxEOFxx >> /root/.ssh/authorized_keys
@@ -125,7 +125,7 @@ restorecon -R -v /root/.ssh
 
 {% else %}
 # Ensure no root login is enabled via ssh
-sed -i 's/^.*PermitRootLogin.*$/PermitRootLogin\ no/' /etc/ssh/sshd_config
+sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin no/g" /etc/ssh/sshd_config
 # Add ssh keys from ssh_keys list
 mkdir {{ pxe_stack_sudo_user_home }}/.ssh
 cat << xxEOFxx >> {{ pxe_stack_sudo_user_home }}/.ssh/authorized_keys
@@ -133,6 +133,7 @@ cat << xxEOFxx >> {{ pxe_stack_sudo_user_home }}/.ssh/authorized_keys
 {{ ssh_key }}
 {% endfor %}
 xxEOFxx
+chown -R {{pxe_stack_sudo_user}}:{{pxe_stack_sudo_user}} {{ pxe_stack_sudo_user_home }}/.ssh
 # Ensure SELinux configuration is ok, best effort
 restorecon -R -v {{ pxe_stack_sudo_user_home }}/.ssh
 # Set admin user as sudo

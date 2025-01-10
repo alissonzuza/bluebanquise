@@ -1,4 +1,3 @@
-[![Kofi](resources/pictures/kofi.png)](https://ko-fi.com/oxedions)
 # BlueBanquise
 ![BlueBanquise Logo](resources/pictures/BlueBanquise_logo_large.svg)
 
@@ -6,7 +5,14 @@
   Web site: <a href="https://bluebanquise.com"><b>https://bluebanquise.com</b></a>
 </p>
 
-:loudspeaker: The main branch is under active dev for now. Consider using a stable branch for production. :loudspeaker:
+---
+Devs infos:
+
+:green_heart: The main branch is now considered stable.
+
+:green_heart: Current core version: 3.0.2 (locked :lock:)
+
+---
 
 ## What is BlueBanquise
 
@@ -33,15 +39,26 @@ The following collections are available. **Please note that for now, only infras
 
 Infrastructure collection should be compatible with all target Linux distributions (RHEL 8, RHEL 9, Debian 11, Debian 12, OpenSuse Leap 15, Ubuntu 20.04, Ubuntu 22.04). Other collections do not support all these distributions (support is added on demand).
 
-Note that few features are still limited on Ubuntu and Debian (mainly network configuration), I am working on it.
+Note that few features are still limited on Ubuntu and Debian (mainly network configuration and diskless), I am working on it.
 
 ## License
 
 BlueBanquise repository is under **MIT license**, except Bluebanquise documentation which is under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
 
+## Donate
+
+If you use and like BlueBanquise, please consider donating to the **UNICEF** (https://www.unicef.org/).
+
+![UNICEF Logo](resources/pictures/UNICEF_Logo.png)
+
+I have a decent job, I don't need money, but they do.
+In the 21th century, it is a shame not all children live in peace.
+
 ## Quickstart
 
 We will assume here you already have a recent Ansible setup and configured. If you are new to Ansible, you can use the [provided generic tutorial](http://bluebanquise.com/tutorials/sysadmin_ansible/).
+
+If you are aiming clients hosts with an old native Python version (RHEL 8 or OpenSuse Leap 15), be sure to cap your ansible-core pip package version to 2.16. 2.17 and more are no more compatible with Python 3.6.
 
 ### 1. Core variables and Jinja2 extensions
 
@@ -117,31 +134,31 @@ Currently tested and supported distributions (other derivative could work) are:
 | Operating System family | Operating System distribution | Tested versions    | Architectures    | Notes                                                       |
 | ----------------------- | ----------------------------- | ------------------ | ---------------- | ----------------------------------------------------------- |
 | Red Hat                 |                               |                    |                  |                                                             |
-|                         | RHEL                          | 7, 8, 9               | x86_64, aarch64  | √                                                           |
-|                         | Rocky Linux                   | 8, 9                  | x86_64, aarch64  | √                                                           |
-|                         | CentOS                        | 7, 8               | x86_64, aarch64  | √                                                           |
+|                         | RHEL                          | 8, 9               | x86_64, aarch64  | √                                                           |
+|                         | Rocky Linux                   | 8, 9               | x86_64, aarch64  | √                                                           |
+|                         | CentOS                        | 8                  | x86_64, aarch64  | √                                                           |
 |                         | CentOS Stream                 | 8                  | x86_64, aarch64  | √                                                           |
-|                         | Alma Linux                    | 8, 9                  | x86_64, aarch64  | √                                                           |
+|                         | Alma Linux                    | 8, 9               | x86_64, aarch64  | √                                                           |
 | Debian                  |                               |                    |                  |                                                             |
-|                         | Ubuntu                        | 20.04, 22.04              | x86_64, arm64  | √. Diskless not supported for now.                          |
-|                         | Debian                        | 11, 12                   |  x86_64, arm64                | √. Diskless not supported for now.  |
+|                         | Ubuntu                        | 20.04, 22.04, 24.04              | x86_64, arm64  | √. Diskless not supported for now.                          |
+|                         | Debian                        | 11, 12             |  x86_64, arm64                | √. Diskless not supported for now.  |
 | Suse                    |                               |                    |                  |                                                             |
-|                         | SLES                          | 15               | x86_64, aarch64  | √. Diskless not supported for now.                                                           |
-|                         | OpenSuse Leap                 | 15               | x86_64, aarch64  | √. Diskless not supported for now.          |
+|                         | SLES                          | 15.6                 | x86_64, aarch64  | √. Diskless not supported for now.                                                           |
+|                         | OpenSuse Leap                 | 15.6                 | x86_64, aarch64  | √. Diskless not supported for now.          |
 
-Ansible >= 4.10.0 is mandatory for BlueBanquise to run properly.
+ansible-core >= 2.16 is mandatory for BlueBanquise to run properly (it might work with earlier versions, but not tested).
 
-Please note that EL 7 systems (Centos 7, RHEL 7, etc.) is now considered best effort only.
+Please note that:
+
+* EL 7 systems (Centos 7, RHEL 7, etc.) is now considered best effort only as system is past EOL.
+* Ubuntu 18.04 and Suse 12 are no more supported (too old, I miss the time to support them).
+* RHEL 8 and OpenSuse Leap 15 need an ansible-core==2.16, 2.17+ is not compatible.
 
 ## The project
 
-BlueBanquise is part of the [**Algoric**](https://algoric.org/) project from the [**Fabrique du Loch**](https://www.lafabriqueduloch.org/fr/accueil/) FabLab, located in Brittany - France.
-
-![BlueBanquise Logo](resources/pictures/FabriqueDuLochAlgoric_logo_large.svg)
-
 It is a revamping of the old stack [Banquise](https://github.com/oxedions/banquise), based on Salt.
 
-The BlueBanquise project is a 100% open source project, not managed by a company, and will stay MIT license.
+:seedling: The BlueBanquise project is a **100% open source project, not managed by a company, and will stay MIT license**. :seedling:
 
 ## The name
 

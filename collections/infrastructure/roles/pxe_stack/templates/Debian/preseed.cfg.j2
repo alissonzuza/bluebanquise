@@ -35,7 +35,7 @@ d-i mirror/http/proxy string {{ hostvars[groups[os_profile][0]]['os_pxe_reposito
 ### Time
 d-i clock-setup/utc-auto boolean true
 d-i clock-setup/utc boolean true
-d-i time/zone string {{ bb_time_zone | default(pxe_stack_time_zone) }} #US/Pacific
+d-i time/zone string {{ pxe_stack_time_zone | default(bb_time_zone, true) | default('Europe/Brussels', true) }} #US/Pacific
 d-i clock-setup/ntp boolean true
 
 ### Partitioning
@@ -64,7 +64,7 @@ d-i passwd/root-password-crypted password {{ hostvars[groups[os_profile][0]]['os
 
 ### Packages
 tasksel tasksel/first multiselect minimal
-d-i pkgsel/include string openssh-server curl python3 {% if os_autoinstall_packages is defined and os_autoinstall_packages is iterable and os_autoinstall_packages is not string and os_autoinstall_packages is not mapping %}{% for package in os_autoinstall_packages %} {{ package }}{% endfor %}{% endif %}
+d-i pkgsel/include string openssh-server curl python3 {% if hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is defined and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is iterable and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not string and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not mapping %}{% for package in hostvars[groups[os_profile][0]]['os_autoinstall_packages'] %} {{ package }}{% endfor %}{% endif %}
 
 d-i pkgsel/upgrade select none
 d-i pkgsel/updatedb boolean false

@@ -1,11 +1,7 @@
 #jinja2: lstrip_blocks: True
-<!-- #### Blue Banquise file ####
-## {{ ansible_managed }} -->
-
 {% if hostvars[groups[os_profile][0]]['os_autoinstall_raw_file'] is defined %}
 {{ hostvars[groups[os_profile][0]]['os_autoinstall_raw_file'] }}
 {% else %}
-
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
@@ -24,6 +20,18 @@
   {% endif %}
 {% endfor %}
     </add_on_products>
+    <add_on_others config:type="list">
+      <listentry>
+        <media_url>http://download.opensuse.org/distribution/leap/$releasever/repo/oss/</media_url>
+        <alias>repo-oss</alias>
+        <name>Main Repository</name>
+      </listentry>
+      <listentry>
+        <media_url>http://download.opensuse.org/update/leap/$releasever/oss/</media_url>
+        <alias>repo-update</alias>
+        <name>Main Update Repository</name>
+      </listentry>
+    </add_on_others>
   </add-on>
 
   <keyboard>
@@ -37,7 +45,7 @@
 
   <timezone>
     <hwclock>UTC</hwclock>
-    <timezone>{{ bb_time_zone | default(pxe_stack_time_zone) }}</timezone>
+    <timezone>{{ pxe_stack_time_zone | default(bb_time_zone, true) | default('Europe/Brussels', true) }}</timezone>
   </timezone>
 
 
@@ -61,8 +69,8 @@
     {% if not pxe_stack_enable_root %}
       <package>sudo</package>
     {% endif %}
-    {% if os_autoinstall_packages is defined and os_autoinstall_packages is iterable and os_autoinstall_packages is not string and os_autoinstall_packages is not mapping %}
-      {% for package in os_autoinstall_packages %}
+    {% if hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is defined and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is iterable and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not string and hostvars[groups[os_profile][0]]['os_autoinstall_packages'] is not mapping %}
+      {% for package in hostvars[groups[os_profile][0]]['os_autoinstall_packages'] %}
       <package>{{ package }}</package>
       {% endfor %}
     {% endif %}
@@ -152,12 +160,11 @@ echo "Defaults:sles !targetpw
 {% endif %}
 {% if (hostvars[groups[hw_profile][0]]['hw_preserve_efi_first_boot_device'] | default(pxe_stack_hw_preserve_efi_first_boot_device)) == true %}
       <script>
-        <debug config:type="boolean">true</debug>
         <filename>post-no-chroot.sh</filename>
         <interpreter>shell</interpreter>
         <chrooted config:type="boolean">false</chrooted>
         <source><![CDATA[
-#!/bin/sh
+#!/bin/sh -x
 
 [ -d /sys/firmware/efi ] && efibootmgr -o $(efibootmgr | grep BootCurrent | cut -d" " -f2),$(efibootmgr | grep BootOrder | sed "s/BootOrder:\ //" | sed "s/$(efibootmgr | grep BootCurrent | cut -d" " -f2),//") || echo "Not an EFI system, skipping"
 
@@ -166,11 +173,10 @@ echo "Defaults:sles !targetpw
       </script>
 {% endif %}
       <script>
-        <debug config:type="boolean">true</debug>
         <filename>post.sh</filename>
         <interpreter>shell</interpreter>
         <source><![CDATA[
-#!/bin/sh
+#!/bin/sh -x
 
 # Turn the kernel parameters into variables
 # We are looking for next_server value
@@ -207,6 +213,17 @@ sed -i "s/enabled=1/enabled=0/" /etc/zypp/repos.d/repo-*
   {% endif %}
 {% endfor %}
     </chroot-scripts>
+   <init-scripts config:type="list">
+      <script>
+        <filename>removeisorepo.sh</filename>
+        <source><![CDATA[
+#!/bin/sh -x
+# Remove iso repository (it contains netboots string inside its URL)
+zypper rr $(zypper lr -d | grep netboots | awk -F '' '{print $1}')
+]]>
+        </source>
+        </script>
+    </init-scripts>
   </scripts>
 
 <general>
